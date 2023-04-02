@@ -62,7 +62,7 @@ class Master_Bot:
                         return True
                     cur = cur.next
                 return False
-        
+
         def findPosition(self, id: int) -> int:
             curIndex: int = 0
             with threading.Lock():
@@ -225,9 +225,14 @@ class Master_Bot:
             if message.author == self.client.user:
                 pass
 
+            elif message.content.startswith("$") and type(message.channel) != discord.channel.DMChannel:
+                reply: discord.message.Message = await message.reply(f"To avoid clutter, please DM me instead. You can DM me by clicking my name on the bar on the right.")
+                await message.delete(delay = 10)
+                await reply.delete(delay = 10)
+
             elif message.content.startswith("$status"):
                 await message.reply(f"Current queue length: {self.queue.size}")
-                if (self.queue.__contains__(self.getName(message.author.id))):
+                if self.isRegistered(message.author.id) and self.queue.__contains__(self.getName(message.author.id)):
                     index: int = self.queue.findPosition(message.author.id)
                     await message.reply(f"Students ahead of you: {index}")
 
@@ -238,18 +243,18 @@ class Master_Bot:
                 if (message.author.id == self.benderID):
                     if self.current != None:
                         self.finish()
-                    else: 
+                    else:
                         await message.reply("No current user")
-                else: 
+                else:
                     await message.reply("You're not Bender :p")
-            
+
             elif message.content.startswith("$skip"):
                 if (message.author.id == self.benderID):
                     if self.current != None:
-                        self.current = None
-                    else: 
+                        self.finish()
+                    else:
                         await message.reply("No current user")
-                else: 
+                else:
                     await message.reply("You're not Bender :p")
 
             elif message.content.startswith("$next"):
@@ -267,7 +272,7 @@ class Master_Bot:
                         self.start()
                         nextInLine: discord.User = self.client.get_user(
                             self.queue.start.discordID) if self.queue.start != None else None
-                        if nextInLine != None: 
+                        if nextInLine != None:
                             await nextInLine.send(f"You're next in line, if you aren't in Davis please head over.")
                 else:
                     message.reply(
