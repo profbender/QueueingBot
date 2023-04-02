@@ -248,15 +248,6 @@ class Master_Bot:
                 else:
                     await message.reply("You're not Bender :p")
 
-            elif message.content.startswith("$skip"):
-                if (message.author.id == self.benderID):
-                    if self.current != None:
-                        self.finish()
-                    else:
-                        await message.reply("No current user")
-                else:
-                    await message.reply("You're not Bender :p")
-
             elif message.content.startswith("$next"):
                 if (message.author.id == self.benderID):
                     if self.current != None:
