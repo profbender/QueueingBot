@@ -160,7 +160,7 @@ class Master_Bot:
         with threading.Lock():
             username: str = self.getColbyUsername(message.author.id)
             entry: int = self.connection.execute(
-                f"SELECT COUNT(*) from queue").fetchone()[0] + 1
+                f"SELECT MAX(entry) from queue").fetchone()[0] + 1
             numAhead: int = self.queue.offer(self.getName(
                 message.author.id), message.content, entry, message.author.id)
             self.connection.execute(f"""INSERT INTO queue (entry, discordID, username, reason, timeEntered) VALUES
@@ -232,7 +232,7 @@ class Master_Bot:
 
             elif message.content.startswith("$status"):
                 await message.reply(f"Current queue length: {self.queue.size}")
-                if self.isRegistered(message.author.id) and self.queue.__contains__(self.getName(message.author.id)):
+                if self.queue.__contains__(message.author.id):
                     index: int = self.queue.findPosition(message.author.id)
                     await message.reply(f"Students ahead of you: {index}")
 
