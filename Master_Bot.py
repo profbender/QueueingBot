@@ -121,6 +121,8 @@ class Master_Bot:
         # Register all events the Bot will listen for
         self.registerEvents()
 
+        self.online = True
+
         # Runs the client, initializing the event loop
         self.client.run(self.config.get('CLIENT_KEY'))
 
@@ -230,14 +232,38 @@ class Master_Bot:
                 await message.delete(delay = 10)
                 await reply.delete(delay = 10)
 
+            elif message.content.startswith("$quit"):
+                if message.author.id == self.benderID:
+                    # await self.client.loop.stop()
+                    await self.client.close()
+                else:
+                    await message.reply("You're not Bender :p")
+
             elif message.content.startswith("$status"):
+                if not self.online: 
+                    await message.reply("Bot currently offline")
                 await message.reply(f"Current queue length: {self.queue.size}")
                 if self.queue.__contains__(message.author.id):
                     index: int = self.queue.findPosition(message.author.id)
                     await message.reply(f"Students ahead of you: {index}")
 
             elif message.content.startswith("$enterQueue"):
-                await self.queueCommand(message)
+                if self.online:
+                    await self.queueCommand(message)
+                else:
+                    await message.reply("Bot currently offline")
+            
+            elif message.content.startswith("$goOffline"):
+                if (message.author.id == self.benderID):
+                    self.online = False
+                else:
+                    await message.reply("You're not Bender :p")
+
+            elif message.content.startswith("$goOnline"):
+                if (message.author.id == self.benderID):
+                    self.online = True
+                else:
+                    await message.reply("You're not Bender :p")
 
             elif message.content.startswith("$finish"):
                 if (message.author.id == self.benderID):
